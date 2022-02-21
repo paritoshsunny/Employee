@@ -8,10 +8,14 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.java.sunny.entity.Employee;
 import com.java.sunny.exceptionHandler.BusinessException;
+import com.java.sunny.model.EmployeePage;
+import com.java.sunny.model.EmployeeSearchCriteria;
+import com.java.sunny.repo.EmployeeCriteriaRepository;
 import com.java.sunny.repo.EmployeeRepo;
 
 @Service
@@ -21,6 +25,9 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepo employeeRepo;
+	
+	@Autowired
+	private EmployeeCriteriaRepository employeeCriteriaRepository;
 
 	// get employee by Id
 	public Employee getEmployeeById(int id) {
@@ -168,6 +175,12 @@ public class EmployeeService {
 			throw new BusinessException(LocalDateTime.now().toString(), "603",
 					"Something went worng " + ex.getMessage());
 		}
-		
 	}
+	
+	
+	//Get List of employee in sorted order and filters
+	public Page<Employee> getEmployees(EmployeePage employeePage, EmployeeSearchCriteria employeeSearchCriteria){
+		return employeeCriteriaRepository.findAllWithfilters(employeePage, employeeSearchCriteria);
+	}
+	
 }
