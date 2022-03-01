@@ -2,21 +2,25 @@ package com.java.sunny.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.java.sunny.entity.Address;
 import com.java.sunny.entity.Employee;
 import com.java.sunny.exceptionHandler.BusinessException;
-import com.java.sunny.model.EmployeePage;
 import com.java.sunny.model.EmployeeSearchCriteria;
-import com.java.sunny.repo.EmployeeCriteriaRepository;
 import com.java.sunny.repo.EmployeeRepo;
+import com.java.sunny.specification.EmployeeSpecification;
 
 @Service
 public class EmployeeService {
@@ -25,9 +29,9 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepo employeeRepo;
-	
+
 	@Autowired
-	private EmployeeCriteriaRepository employeeCriteriaRepository;
+	private AddressService addressService;
 
 	// get employee by Id
 	public Employee getEmployeeById(int id) {
@@ -37,9 +41,9 @@ public class EmployeeService {
 				throw new BusinessException(LocalDateTime.now().toString(), "601", "Id is less then Zero");
 			}
 			Employee emp = employeeRepo.findById(id).orElse(null);
-			if(emp==null) {
+			if (emp == null) {
 				throw new NullPointerException();
-			}else {
+			} else {
 				return emp;
 			}
 		} catch (NumberFormatException ex) {
@@ -71,17 +75,117 @@ public class EmployeeService {
 		return employeeRepo.findAll();
 	}
 
+	// update and save employee
+	public Employee saveEmployee(Employee employee) {
+		Employee emp = new Employee();
+		try {
+			if (employee.equals(null) || employee.getFirstName().isEmpty() || employee.getFirstName().length() == 0) {
+				throw new BusinessException(LocalDateTime.now().toString(), "605",
+						"Nothing to save or first name is empty, please check.");
+			} else if (employee.getSalary() > 999999999) {
+				throw new BusinessException(LocalDateTime.now().toString(), "605",
+						"Salary must be less then or equal to 999999999");
+			}
+
+			if (employee.getEmpCode() != null) {
+				emp = employeeRepo.findById(employee.getEmpCode()).orElse(null);
+				if (emp == null) {
+					throw new NoSuchElementException();
+				}
+				emp.setFirstName(employee.getFirstName());
+				emp.setLastName(employee.getLastName());
+				emp.setAddresses(employee.getAddresses().stream().map(v -> {
+					Address add = addressService.getAddressById(v.getAddId());
+					List<Employee> empList = add.getEmployees();
+					if(empList.size()<=1) {
+						add.setHouseNo(v.getHouseNo());
+						add.setCity(v.getCity());
+						add.setEmployees(Stream.of(employee).collect(Collectors.toList()));
+						return add;
+					}else {
+						Address address = addressService.getAddressByHouseNoAndCity(v.getHouseNo(), v.getCity());
+						if(address==null) {
+							Address addr = new Address();
+							addr.setCity(v.getCity());
+							addr.setHouseNo(v.getHouseNo());
+							addr.setEmployees(Stream.of(employee).collect(Collectors.toList()));
+							return addr;
+						}else {
+							address.setEmployees(Stream.of(employee).collect(Collectors.toList()));
+							return address;
+						}
+					}
+				}).collect(Collectors.toList()));
+				emp.setDesignation(employee.getDesignation());
+				emp.setDepartment(employee.getDepartment());
+				emp.setModifiedOn(LocalDate.now());
+				emp.setEmail(employee.getEmail());
+				emp.setSalary(employee.getSalary());
+				logger.trace("Updateing existing employee");
+				return employeeRepo.save(emp);
+			}
+
+			// save an employee
+			else {
+				emp.setFirstName(employee.getFirstName());
+				emp.setLastName(employee.getLastName());
+				emp.setAddresses(employee.getAddresses().stream().map(v -> {
+					Address addr = addressService.getAddressByHouseNoAndCity(v.getHouseNo(), v.getCity());
+					if(addr==null) {
+						Address add = v;
+						add.setEmployees(Stream.of(employee).collect(Collectors.toList()));
+						return add;
+					}else {
+						return addr;
+					}
+				}).collect(Collectors.toList()));
+				emp.setDesignation(employee.getDesignation());
+				emp.setDepartment(employee.getDepartment());
+				emp.setCreatedOn(LocalDate.now());
+				emp.setModifiedOn(LocalDate.now());
+				emp.setEmail(employee.getEmail());
+				emp.setSalary(employee.getSalary());
+				logger.trace("Saving an employee");
+				return employeeRepo.save(emp);
+
+			}
+		} catch (NoSuchElementException ex) {
+			throw new BusinessException(LocalDateTime.now().toString(), "606",
+					"Employee not present by Id " + employee.getEmpCode());
+		} catch (IllegalArgumentException e) {
+			throw new BusinessException(LocalDateTime.now().toString(), "605",
+					"Please provide Employee details" + e.getMessage());
+		} catch (Exception ex) {
+			throw new BusinessException(LocalDateTime.now().toString(), "603",
+					"Something went worng " + ex.getMessage());
+		}
+	}
+
 	// save list of Employees
 	public List<Employee> saveAllEmployee(List<Employee> employees) {
 		logger.trace("Saving list of employees");
+		List<Employee> empList=new ArrayList<>();
 		try {
 			if (employees.isEmpty())
 				throw new BusinessException(LocalDateTime.now().toString(), "605", "List is empty, Nothing to save");
 			for (Employee emp : employees) {
-				emp.setCreatedOn(LocalDate.now());
-				emp.setModifiedOn(LocalDate.now());
+				Employee employee=new Employee();
+				employee.setFirstName(emp.getFirstName());
+				employee.setLastName(emp.getLastName());
+				employee.setAddresses(emp.getAddresses().stream().map(v -> {
+					Address add = v;
+					add.setEmployees(Stream.of(emp).collect(Collectors.toList()));
+					return add;
+				}).collect(Collectors.toList()));
+				employee.setDesignation(emp.getDesignation());
+				employee.setDepartment(emp.getDepartment());
+				employee.setCreatedOn(LocalDate.now());
+				employee.setModifiedOn(LocalDate.now());
+				employee.setEmail(emp.getEmail());
+				employee.setSalary(emp.getSalary());
+				empList.add(employee);
 			}
-			return employeeRepo.saveAll(employees);
+			return employeeRepo.saveAll(empList);
 		} catch (Exception e) {
 			throw new BusinessException(LocalDateTime.now().toString(), "603",
 					"Something went worng " + e.getMessage());
@@ -120,8 +224,9 @@ public class EmployeeService {
 			throw new BusinessException(LocalDateTime.now().toString(), "602",
 					"Can not cast parameter to Integer" + ex.getMessage());
 		} catch (NoSuchElementException ex) {
-			throw new BusinessException(LocalDateTime.now().toString(), "606", "Employee not present" + ex.getMessage());
-		}catch (IllegalArgumentException ex) {
+			throw new BusinessException(LocalDateTime.now().toString(), "606",
+					"Employee not present" + ex.getMessage());
+		} catch (IllegalArgumentException ex) {
 			throw new BusinessException(LocalDateTime.now().toString(), "605", "Id is null" + ex.getMessage());
 		} catch (NullPointerException ex) {
 			throw new BusinessException(LocalDateTime.now().toString(), "606", "Employee not present with id - " + id);
@@ -132,55 +237,10 @@ public class EmployeeService {
 
 	}
 
-	// update and save employee
-	public Employee saveEmployee(Employee employee) {
-		try {
-			if(employee.equals(null)||employee.getFirstName().isEmpty()||employee.getFirstName().length()==0) {
-				throw new BusinessException(LocalDateTime.now().toString(), "605", "Nothing to save or first name is empty, please check.");
-			}else if (employee.getSalary()>999999999) {
-				throw new BusinessException(LocalDateTime.now().toString(), "605", "Salary must be less then or equal to 999999999");
-			}
-			Employee existingEmp;
-
-			if (employee.getEmpCode() != null) {
-				existingEmp = employeeRepo.findById(employee.getEmpCode()).orElse(null);
-				if (existingEmp==null) {
-					throw new NoSuchElementException();
-				}
-				existingEmp.setFirstName(employee.getFirstName());
-				existingEmp.setLastName(employee.getLastName());
-				existingEmp.setAddress(employee.getAddress());
-				existingEmp.setDesignation(employee.getDesignation());
-				existingEmp.setDepartment(employee.getDepartment());
-				existingEmp.setModifiedOn(LocalDate.now());
-				existingEmp.setEmail(employee.getEmail());
-				existingEmp.setSalary(employee.getSalary());
-				logger.trace("Updateing existing employee");
-				return employeeRepo.save(existingEmp);
-			}
-
-			// save an employee
-			else {
-				employee.setCreatedOn(LocalDate.now());
-				employee.setModifiedOn(LocalDate.now());
-				logger.trace("Saving an employee");
-				return employeeRepo.save(employee);
-
-			}
-		} catch (NoSuchElementException ex) {
-			throw new BusinessException(LocalDateTime.now().toString(), "606", "Employee not present by Id " + employee.getEmpCode());
-		} catch (IllegalArgumentException e) {
-			throw new BusinessException(LocalDateTime.now().toString(), "605", "Please provide Employee details" + e.getMessage());
-		} catch (Exception ex) {
-			throw new BusinessException(LocalDateTime.now().toString(), "603",
-					"Something went worng " + ex.getMessage());
-		}
+	// Get List of employee in sorted order and filters
+	public Page<Employee> getEmployees(Pageable employeePage, EmployeeSearchCriteria employeeSearchCriteria) {
+		return (Page<Employee>) employeeRepo
+				.findAll(EmployeeSpecification.findAllEmployee(employeeSearchCriteria, employeePage), employeePage);
 	}
-	
-	
-	//Get List of employee in sorted order and filters
-	public Page<Employee> getEmployees(EmployeePage employeePage, EmployeeSearchCriteria employeeSearchCriteria){
-		return employeeCriteriaRepository.findAllWithfilters(employeePage, employeeSearchCriteria);
-	}
-	
+
 }

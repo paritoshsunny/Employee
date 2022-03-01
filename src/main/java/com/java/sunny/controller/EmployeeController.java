@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.java.sunny.entity.Employee;
 import com.java.sunny.entity.EmployeeResponse;
-import com.java.sunny.model.EmployeePage;
 import com.java.sunny.model.EmployeeSearchCriteria;
 import com.java.sunny.service.EmployeeService;
 
@@ -109,7 +109,7 @@ public class EmployeeController {
 	}
 	
 	@GetMapping("/getemp")
-	public ResponseEntity<Page<Employee>> getEmployees(EmployeePage employeePage, EmployeeSearchCriteria employeeSearchCriteria){
+	public ResponseEntity<Page<Employee>> getEmployees(Pageable employeePage, EmployeeSearchCriteria employeeSearchCriteria){
 		return new ResponseEntity<>(employeeService.getEmployees(employeePage, employeeSearchCriteria),HttpStatus.OK);
 	}
 }
