@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.java.sunny.entity.Employee;
 import com.java.sunny.entity.EmployeeResponse;
 import com.java.sunny.model.EmployeeSearchCriteria;
+import com.java.sunny.request.SaveEmployeeRequest;
 import com.java.sunny.service.EmployeeService;
+import com.java.sunny.service.SaveEmployeeService;
 
 @RestController
 @Validated
@@ -39,6 +41,9 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService employeeService;
+	
+	@Autowired
+	private SaveEmployeeService saveEmployeeService;
 
 	@PostMapping("/save")
 	public ResponseEntity<EmployeeResponse> saveEmployee(@Valid @RequestBody Employee emp) {
@@ -111,5 +116,13 @@ public class EmployeeController {
 	@GetMapping("/getemp")
 	public ResponseEntity<Page<Employee>> getEmployees(Pageable employeePage, EmployeeSearchCriteria employeeSearchCriteria){
 		return new ResponseEntity<>(employeeService.getEmployees(employeePage, employeeSearchCriteria),HttpStatus.OK);
+	}
+	
+	@PostMapping("/saveEmployeeWithAddress")
+	public ResponseEntity<EmployeeResponse> saveEmployeeWithAddress(@RequestBody SaveEmployeeRequest saveEmployeeRequest){
+		logger.trace("Inside saveEmployeeWithAddress controller");
+		EmployeeResponse status = saveEmployeeService.saveEmployeeWithAddress(saveEmployeeRequest);
+		return new ResponseEntity<>(status, HttpStatus.OK);
+		
 	}
 }

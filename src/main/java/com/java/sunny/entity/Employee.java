@@ -1,16 +1,10 @@
 package com.java.sunny.entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
@@ -27,7 +21,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Entity
-@Table(name="EMPLOYEE")
+@Table(name="EMPLOYEE_TABLE")
 @ToString
 public class Employee {
 	
@@ -57,14 +51,8 @@ public class Employee {
 	
 	
 	@Min(10000)@Max(999999999)
-	private int salary;
+	private Integer salary;
+	@NotNull
+	private Integer addId;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(
-				name = "employee_address",
-				joinColumns = @JoinColumn(name = "emp_code", referencedColumnName = "empCode"),
-				inverseJoinColumns = @JoinColumn(name = "add_id", referencedColumnName = "addId")
-			)
-	private List<Address> addresses;
-
 }

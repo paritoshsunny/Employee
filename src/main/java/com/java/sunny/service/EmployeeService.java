@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.java.sunny.entity.Address;
 import com.java.sunny.entity.Employee;
 import com.java.sunny.exceptionHandler.BusinessException;
 import com.java.sunny.model.EmployeeSearchCriteria;
@@ -30,8 +28,8 @@ public class EmployeeService {
 	@Autowired
 	private EmployeeRepo employeeRepo;
 
-	@Autowired
-	private AddressService addressService;
+//	@Autowired
+//	private AddressService addressService;
 
 	// get employee by Id
 	public Employee getEmployeeById(int id) {
@@ -76,6 +74,7 @@ public class EmployeeService {
 	}
 
 	// update and save employee
+	@Transactional
 	public Employee saveEmployee(Employee employee) {
 		Employee emp = new Employee();
 		try {
@@ -94,28 +93,6 @@ public class EmployeeService {
 				}
 				emp.setFirstName(employee.getFirstName());
 				emp.setLastName(employee.getLastName());
-				emp.setAddresses(employee.getAddresses().stream().map(v -> {
-					Address add = addressService.getAddressById(v.getAddId());
-					List<Employee> empList = add.getEmployees();
-					if(empList.size()<=1) {
-						add.setHouseNo(v.getHouseNo());
-						add.setCity(v.getCity());
-						add.setEmployees(Stream.of(employee).collect(Collectors.toList()));
-						return add;
-					}else {
-						Address address = addressService.getAddressByHouseNoAndCity(v.getHouseNo(), v.getCity());
-						if(address==null) {
-							Address addr = new Address();
-							addr.setCity(v.getCity());
-							addr.setHouseNo(v.getHouseNo());
-							addr.setEmployees(Stream.of(employee).collect(Collectors.toList()));
-							return addr;
-						}else {
-							address.setEmployees(Stream.of(employee).collect(Collectors.toList()));
-							return address;
-						}
-					}
-				}).collect(Collectors.toList()));
 				emp.setDesignation(employee.getDesignation());
 				emp.setDepartment(employee.getDepartment());
 				emp.setModifiedOn(LocalDate.now());
@@ -129,22 +106,13 @@ public class EmployeeService {
 			else {
 				emp.setFirstName(employee.getFirstName());
 				emp.setLastName(employee.getLastName());
-				emp.setAddresses(employee.getAddresses().stream().map(v -> {
-					Address addr = addressService.getAddressByHouseNoAndCity(v.getHouseNo(), v.getCity());
-					if(addr==null) {
-						Address add = v;
-						add.setEmployees(Stream.of(employee).collect(Collectors.toList()));
-						return add;
-					}else {
-						return addr;
-					}
-				}).collect(Collectors.toList()));
 				emp.setDesignation(employee.getDesignation());
 				emp.setDepartment(employee.getDepartment());
 				emp.setCreatedOn(LocalDate.now());
 				emp.setModifiedOn(LocalDate.now());
 				emp.setEmail(employee.getEmail());
 				emp.setSalary(employee.getSalary());
+				emp.setAddId(employee.getAddId());
 				logger.trace("Saving an employee");
 				return employeeRepo.save(emp);
 
@@ -162,21 +130,17 @@ public class EmployeeService {
 	}
 
 	// save list of Employees
+	@Transactional
 	public List<Employee> saveAllEmployee(List<Employee> employees) {
 		logger.trace("Saving list of employees");
-		List<Employee> empList=new ArrayList<>();
+		List<Employee> empList = new ArrayList<>();
 		try {
 			if (employees.isEmpty())
 				throw new BusinessException(LocalDateTime.now().toString(), "605", "List is empty, Nothing to save");
 			for (Employee emp : employees) {
-				Employee employee=new Employee();
+				Employee employee = new Employee();
 				employee.setFirstName(emp.getFirstName());
 				employee.setLastName(emp.getLastName());
-				employee.setAddresses(emp.getAddresses().stream().map(v -> {
-					Address add = v;
-					add.setEmployees(Stream.of(emp).collect(Collectors.toList()));
-					return add;
-				}).collect(Collectors.toList()));
 				employee.setDesignation(emp.getDesignation());
 				employee.setDepartment(emp.getDepartment());
 				employee.setCreatedOn(LocalDate.now());
@@ -207,6 +171,7 @@ public class EmployeeService {
 	}
 
 	// delete employee
+	@Transactional
 	public String deleteEmployee(int id) {
 		logger.trace("deleting employee by Id");
 		try {
