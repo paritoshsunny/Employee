@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,7 @@ public class AddressController {
 	private AddressService addressService;
 
 	@PostMapping("/save")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> saveAddress(@Valid @RequestBody Address add) {
 		logger.trace("Inside saveEmployee controller");
 		List<Address> addList = new ArrayList<>();
@@ -49,6 +51,7 @@ public class AddressController {
 	}
 
 	@PostMapping("/saveAll")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> saveAllAddresses(@Valid @RequestBody List<Address> addrList) {
 		logger.trace("Inside saveAllAddresses controller");
 		List<Address> addr = addressService.saveAllAddress(addrList);
@@ -58,6 +61,7 @@ public class AddressController {
 	}
 
 	@GetMapping("/getAll")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> getAll() {
 		logger.trace("Inside getAll controller");
 		List<Address> addrList = addressService.getAllAddress();
@@ -67,6 +71,7 @@ public class AddressController {
 	}
 
 	@GetMapping("/getById/{id}")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> getById(@PathVariable("id") int id) {
 		logger.trace("Inside getById controller");
 		List<Address> addrList = new ArrayList<>();
@@ -78,6 +83,7 @@ public class AddressController {
 	}
 
 	@GetMapping("/get/{name}")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> getByName(@PathVariable @NotBlank @Size(min = 2, max = 25) String name) {
 		logger.trace("Inside rempveEmployee controller");
 		List<Address> addrList = addressService.getByCity(name);
@@ -87,6 +93,7 @@ public class AddressController {
 	}
 
 	@DeleteMapping("delete/{id}")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> rempveEmployee(@PathVariable int id) {
 		logger.trace("Inside rempveEmployee controller");
 		String status = addressService.deleteAddress(id);
@@ -95,6 +102,7 @@ public class AddressController {
 	}
 
 	@PutMapping("/update")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<AddressResponse> updateEmployee(@Valid @RequestBody Address address) {
 		logger.trace("Inside updateEmployee controller");
 		List<Address> addrList = new ArrayList<>();

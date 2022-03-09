@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,7 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@PostMapping("/save")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<EmployeeResponse> saveEmployee(@Valid @RequestBody Employee emp) {
 		logger.trace("Inside saveEmployee controller");
 		List<Employee> empList = new ArrayList<>();
@@ -52,6 +54,7 @@ public class EmployeeController {
 	}
 
 	@PostMapping("/saveAll")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> saveAllEmployee(@Valid @RequestBody List<Employee> emp) {
 		logger.trace("Inside saveAllEmployee controller");
 		List<Employee> empList = employeeService.saveAllEmployee(emp);
@@ -61,6 +64,7 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/getAll")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> getAll() {
 		logger.trace("Inside getAll controller");
 		List<Employee> empList = employeeService.getAllEmployee();
@@ -70,6 +74,7 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/getById/{id}")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> getById(@PathVariable("id") int id) {
 		logger.trace("Inside getById controller");
 		List<Employee> empList = new ArrayList<>();
@@ -81,6 +86,7 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/get/{name}")
+	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> getByName(@PathVariable @NotBlank @Size(min = 2, max = 25) String name) {
 		logger.trace("Inside rempveEmployee controller");
 		List<Employee> empList = employeeService.getByFirstName(name);
@@ -90,6 +96,7 @@ public class EmployeeController {
 	}
 
 	@DeleteMapping("delete/{id}")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> rempveEmployee(@PathVariable int id) {
 		logger.trace("Inside rempveEmployee controller");
 		String status = employeeService.deleteEmployee(id);
@@ -98,6 +105,7 @@ public class EmployeeController {
 	}
 
 	@PutMapping("/update")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<EmployeeResponse> updateEmployee(@Valid @RequestBody Employee emp) {
 		logger.trace("Inside updateEmployee controller");
 		List<Employee> empList = new ArrayList<>();
@@ -109,6 +117,7 @@ public class EmployeeController {
 	}
 	
 	@GetMapping("/getemp")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Page<Employee>> getEmployees(Pageable employeePage, EmployeeSearchCriteria employeeSearchCriteria){
 		return new ResponseEntity<>(employeeService.getEmployees(employeePage, employeeSearchCriteria),HttpStatus.OK);
 	}
