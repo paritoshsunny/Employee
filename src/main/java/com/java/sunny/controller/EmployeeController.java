@@ -26,10 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.java.sunny.VO.EmployeeVO;
 import com.java.sunny.entity.Employee;
 import com.java.sunny.entity.EmployeeResponse;
 import com.java.sunny.model.EmployeeSearchCriteria;
 import com.java.sunny.service.EmployeeService;
+import com.java.sunny.util.EmpUtil;
 
 @RestController
 @Validated
@@ -48,7 +50,8 @@ public class EmployeeController {
 		List<Employee> empList = new ArrayList<>();
 		Employee empl = employeeService.saveEmployee(emp);
 		empList.add(empl);
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "Employee saved sucessfully",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
@@ -58,7 +61,8 @@ public class EmployeeController {
 	public ResponseEntity<EmployeeResponse> saveAllEmployee(@Valid @RequestBody List<Employee> emp) {
 		logger.trace("Inside saveAllEmployee controller");
 		List<Employee> empList = employeeService.saveAllEmployee(emp);
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "All employees added successfully",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
@@ -68,7 +72,8 @@ public class EmployeeController {
 	public ResponseEntity<EmployeeResponse> getAll() {
 		logger.trace("Inside getAll controller");
 		List<Employee> empList = employeeService.getAllEmployee();
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "Success",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
@@ -80,7 +85,8 @@ public class EmployeeController {
 		List<Employee> empList = new ArrayList<>();
 		Employee empl = employeeService.getEmployeeById(id);
 		empList.add(empl);
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "Success",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
@@ -90,7 +96,8 @@ public class EmployeeController {
 	public ResponseEntity<EmployeeResponse> getByName(@PathVariable @NotBlank @Size(min = 2, max = 25) String name) {
 		logger.trace("Inside rempveEmployee controller");
 		List<Employee> empList = employeeService.getByFirstName(name);
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "Success",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
@@ -111,7 +118,8 @@ public class EmployeeController {
 		List<Employee> empList = new ArrayList<>();
 		Employee empl = employeeService.saveEmployee(emp);
 		empList.add(empl);
-		EmployeeResponse employeeResponse = new EmployeeResponse(empList, "200", "Employee details updated",
+		List<EmployeeVO> employees=EmpUtil.convertEmpEntityToVO(empList);
+		EmployeeResponse employeeResponse = new EmployeeResponse(employees, "200", "Success",
 				LocalDateTime.now().toString());
 		return new ResponseEntity<EmployeeResponse>(employeeResponse, HttpStatus.OK);
 	}
