@@ -21,8 +21,6 @@ import com.java.sunny.service.UserDetailsServiceImpl;
 import com.java.sunny.util.MyJwtUtils;
 
 
-
-
 public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private MyJwtUtils jwtUtils;
