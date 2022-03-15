@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.java.sunny.model.MyUser;
-import com.java.sunny.repo.UserRepository;
+import com.java.sunny.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

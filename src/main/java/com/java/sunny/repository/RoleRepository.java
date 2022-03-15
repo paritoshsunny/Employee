@@ -1,4 +1,4 @@
-package com.java.sunny.repo;
+package com.java.sunny.repository;
 
 import java.util.Optional;
 
