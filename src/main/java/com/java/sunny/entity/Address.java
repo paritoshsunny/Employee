@@ -12,6 +12,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +25,8 @@ public class Address {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Max(99999)
+	@JsonFormat
+    (shape = JsonFormat.Shape.STRING)
 	private Integer addId;
 	@NotNull
 	@Size(min=1,max=5,message="House number should be mininum 1 char and max 5 char long")
@@ -32,6 +36,8 @@ public class Address {
 	private String city;
 	
 	@ManyToMany(mappedBy = "addresses")
+	@JsonFormat
+    (shape = JsonFormat.Shape.STRING)
 	private List<Employee> employees;
 	
 

@@ -33,7 +33,7 @@ public class UserDbConfig {
 	private String username;
 	@Value("${spring.user.datasource.password}")
 	private String password;
-	@Value("${spring.employee.datasource.jdbcUrl}")
+	@Value("${spring.user.datasource.jdbcUrl}")
 	private String url;
 	@Value("${user.poolSize}")
 	private Integer poolSize;
