@@ -216,6 +216,7 @@ public class EmployeeService {
 	}
 
 	// delete employee
+	@CacheEvict(cacheNames = "employee", key = "#id")
 	public String deleteEmployee(int id) {
 		logger.trace("deleting employee by Id");
 		try {
@@ -247,6 +248,7 @@ public class EmployeeService {
 	}
 
 	// Get List of employee in sorted order and filters
+	@Cacheable(cacheNames = "employeeSorted")
 	public Page<Employee> getEmployees(Pageable employeePage, EmployeeSearchCriteria employeeSearchCriteria) {
 		return (Page<Employee>) employeeRepo
 				.findAll(EmployeeSpecification.findAllEmployee(employeeSearchCriteria, employeePage), employeePage);

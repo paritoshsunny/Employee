@@ -1,0 +1,63 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://www.ehcache.org/ehcache.xsd" 
+    updateCheck="true"
+    monitoring="autodetect" 
+    dynamicConfig="true">
+
+
+    <defaultCache
+        maxElementsInMemory="10000" 
+        eternal="false"
+        timeToIdleSeconds="120" 
+        timeToLiveSeconds="120" 
+        overflowToDisk="true"
+        maxElementsOnDisk="10000000" 
+        diskPersistent="true"
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LRU" />
+    <!-- IMPORTANT: Change name to your name -->
+    <cache 
+        name="employeeList" 
+        maxElementsInMemory="500" 
+        eternal="false"
+        overflowToDisk="true" 
+        timeToIdleSeconds="300" 
+        timeToLiveSeconds="600"
+        diskPersistent="true" 
+        diskExpiryThreadIntervalSeconds="1"
+        memoryStoreEvictionPolicy="LFU" />
+        
+        <cache 
+        name="employee" 
+        maxElementsInMemory="500" 
+        eternal="false"
+        overflowToDisk="true" 
+        timeToIdleSeconds="300" 
+        timeToLiveSeconds="600"
+        diskPersistent="true" 
+        diskExpiryThreadIntervalSeconds="1"
+        memoryStoreEvictionPolicy="LFU" />
+        
+        <cache 
+        name="employeeName" 
+        maxElementsInMemory="500" 
+        eternal="false"
+        overflowToDisk="true" 
+        timeToIdleSeconds="300" 
+        timeToLiveSeconds="600"
+        diskPersistent="true" 
+        diskExpiryThreadIntervalSeconds="1"
+        memoryStoreEvictionPolicy="LFU" />
+        
+        <cache 
+        name="employeeSorted" 
+        maxElementsInMemory="500" 
+        eternal="false"
+        overflowToDisk="true" 
+        timeToIdleSeconds="300" 
+        timeToLiveSeconds="600"
+        diskPersistent="true" 
+        diskExpiryThreadIntervalSeconds="1"
+        memoryStoreEvictionPolicy="LFU" />
+
+</ehcache>
