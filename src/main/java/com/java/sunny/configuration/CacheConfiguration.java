@@ -27,10 +27,38 @@ public class CacheConfiguration extends CachingConfigurerSupport{
 	}
 	
 	public net.sf.ehcache.CacheManager ehCacheMaanger() {
-		EhCacheManagerFactoryBean bean=new EhCacheManagerFactoryBean();
-		bean.setConfigLocation(new ClassPathResource("/Employee/ehcache.xml"));
-		bean.setShared(true);
-		return bean.getObject();
+		
+		net.sf.ehcache.config.CacheConfiguration employeeList=new net.sf.ehcache.config.CacheConfiguration();
+		employeeList.setName("employeeList");
+		employeeList.setMaxEntriesLocalHeap(1000);
+		employeeList.internalSetTimeToIdle(18000);
+		employeeList.setTimeToIdleSeconds(1000);
+		
+		net.sf.ehcache.config.CacheConfiguration employee=new net.sf.ehcache.config.CacheConfiguration();
+		employee.setName("employee");
+		employee.setMaxEntriesLocalHeap(1000);
+		employee.internalSetTimeToIdle(18000);
+		employee.setTimeToIdleSeconds(1000);
+		
+		net.sf.ehcache.config.CacheConfiguration employeeName=new net.sf.ehcache.config.CacheConfiguration();
+		employeeName.setName("employeeName");
+		employeeName.setMaxEntriesLocalHeap(1000);
+		employeeName.internalSetTimeToIdle(18000);
+		employeeName.setTimeToIdleSeconds(1000);
+		
+		net.sf.ehcache.config.CacheConfiguration employeeSorted=new net.sf.ehcache.config.CacheConfiguration();
+		employeeSorted.setName("employeeSorted");
+		employeeSorted.setMaxEntriesLocalHeap(1000);
+		employeeSorted.internalSetTimeToIdle(18000);
+		employeeSorted.setTimeToIdleSeconds(1000);
+		
+		net.sf.ehcache.config.Configuration config=new net.sf.ehcache.config.Configuration();
+		config.addCache(employeeSorted);
+		config.addCache(employeeName);
+		config.addCache(employee);
+		config.addCache(employeeList);
+		
+		return net.sf.ehcache.CacheManager.newInstance(config);
 	
 	}
 }
