@@ -38,7 +38,7 @@ public class EmployeeService {
 	private AddressService addressService;
 
 	// get employee by Id
-	@Cacheable(cacheNames = "employee", key = "#id" )
+	@Cacheable(value = "employee", key = "#id" )
 	public Employee getEmployeeById(int id) {
 		logger.trace("Get employee by ID" + id);
 		try {
@@ -65,7 +65,6 @@ public class EmployeeService {
 	}
 
 	// get list of all employee
-	@Cacheable(cacheNames = "employeeList")
 	public List<Employee> getAllEmployee() {
 		logger.trace("Getting list of all employees");
 		try {
@@ -82,7 +81,7 @@ public class EmployeeService {
 	}
 
 	// update and save employee
-	@CachePut(cacheNames = "employee", key = "#employee.empCode")
+	@CachePut(value = "employee", key = "#employee.empCode")
 	public Employee saveEmployee(Employee employee) {
 		Employee emp = new Employee();
 		try {
@@ -169,7 +168,6 @@ public class EmployeeService {
 	}
 
 	// save list of Employees
-	@Caching(put = {@CachePut(cacheNames = "employeeList")})
 	public List<Employee> saveAllEmployee(List<Employee> employees) {
 		logger.trace("Saving list of employees");
 		List<Employee> empList=new ArrayList<>();
@@ -201,7 +199,7 @@ public class EmployeeService {
 	}
 
 	// get employee by firstName
-	@Cacheable(cacheNames = "employeeName", key = "#fName")
+	@Cacheable(value = "employeeName", key = "#fName")
 	public List<Employee> getByFirstName(String fName) {
 		logger.trace("Getting list of employee by first name");
 		try {
@@ -216,6 +214,7 @@ public class EmployeeService {
 	}
 
 	// delete employee
+	@Caching(evict = {@CacheEvict(value = "employee",key = "#id")})
 	public String deleteEmployee(int id) {
 		logger.trace("deleting employee by Id");
 		try {

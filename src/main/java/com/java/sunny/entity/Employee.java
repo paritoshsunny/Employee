@@ -1,5 +1,6 @@
 package com.java.sunny.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,8 +29,10 @@ import lombok.ToString;
 @Entity
 @Table(name="EMPLOYEE")
 @ToString
-public class Employee {
+public class Employee implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue
 	@Min(1)@Max(99999999)
