@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,6 +19,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.java.sunny.configuration.LocalDateTimeDeserializer;
+import com.java.sunny.configuration.LocalDateTimeSerializer;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +37,7 @@ import lombok.ToString;
 @Entity
 @Table(name="EMPLOYEE")
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "empCode")
 public class Employee implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -51,7 +60,11 @@ public class Employee implements Serializable{
 	
 	@NotNull
 	private String department;
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	private LocalDate createdOn;
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	private LocalDate modifiedOn;
 	@Email
 	@NotNull
@@ -61,7 +74,7 @@ public class Employee implements Serializable{
 	@Min(10000)@Max(999999999)
 	private int salary;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinTable(
 				name = "employee_address",
 				joinColumns = @JoinColumn(name = "emp_code", referencedColumnName = "empCode"),

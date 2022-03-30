@@ -214,7 +214,7 @@ public class EmployeeService {
 	}
 
 	// delete employee
-	@Caching(evict = {@CacheEvict(value = "employee",key = "#id")})
+	@Caching(evict = {@CacheEvict(value = "employee",key = "#id",allEntries = true)})
 	public String deleteEmployee(int id) {
 		logger.trace("deleting employee by Id");
 		try {

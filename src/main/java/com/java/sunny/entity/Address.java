@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,6 +15,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="ADDRESS")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "addId")
 public class Address implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -37,9 +41,7 @@ public class Address implements Serializable{
 	@Size(min=2,max=25,message="City should be mininum 2 char and max 25 char long")
 	private String city;
 	
-	@ManyToMany(mappedBy = "addresses")
-	@JsonFormat
-    (shape = JsonFormat.Shape.STRING)
+	@ManyToMany(mappedBy = "addresses",fetch = FetchType.EAGER)
 	private List<Employee> employees;
 	
 
